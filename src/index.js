@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 const connection = require("./database/database");
+const modelPergunta = require("./database/models/Pergunta");
 
 // Conexão MySQL
 connection
@@ -28,6 +29,55 @@ app.get("/", (req, res) => {
       res.render("index", {
         perguntas,
       });
+    });
+});
+
+app.get("/salvarpergunta", (req, res) => {
+  const { titulo, descricao } = req.body;
+  modelPergunta
+    .create({
+      titulo,
+      descricao,
+    })
+    .then(() => {
+      res.redirect("/");
+    });
+});
+
+app.get("/pergunta/:id", (req, res) => {
+  const id = req.params.id;
+  modelPergunta
+    .findOne({
+      where: { id: id },
+    })
+    .then((pergunta) => {
+      if (pergunta != undefined) {
+        modelResposta
+          .findAll({
+            where: { perguntaId: pergunta.id }, // Relacionamento
+            order: [["id", "DESC"]],
+          })
+          .then((respostas) => {
+            res.render("pergunta", {
+              pergunta,
+              respostas,
+            });
+          });
+      } else {
+        res.redirect("/");
+      }
+    });
+});
+
+app.post("/responder", (req, res) => {
+  const { corpo, perguntaId } = req.body;
+  modelResposta
+    .create({
+      corpo,
+      perguntaId,
+    })
+    .then(() => {
+      res.redirect(`/pergunta/${perguntaId}`);
     });
 });
 
