@@ -3,10 +3,11 @@ const app = express();
 
 const connection = require("./database/database");
 const modelPergunta = require("./database/models/Pergunta");
+const modelResposta = require("./database/models/Resposta");
 
 // Conexão MySQL
 connection
-  .autheticate()
+  .authenticate()
   .then(() => {
     console.log("Conexão feita com o MySQL");
   })
