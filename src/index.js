@@ -20,6 +20,17 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  modelPergunta
+    .findAll({ raw: true, order: [["id", "desc"]] })
+    .then((perguntas) => {
+      // console.log(perguntas);
+      res.render("index", {
+        perguntas,
+      });
+    });
+});
+
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server connected at http://localhost");
 });
