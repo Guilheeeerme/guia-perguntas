@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-
 const connection = require("./database/database");
-const modelPergunta = require("./database/models/Pergunta");
-const modelResposta = require("./database/models/Resposta");
+
+const rotaPerguntas = require("./routes/perguntas");
+const rotaPerguntar = require("./routes/perguntar");
+const rotaPerguntaID = require("./routes/perguntaID");
+const rotaResponder = require("./routes/responder");
 
 // Conexão MySQL
 connection
@@ -22,65 +24,10 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  modelPergunta
-    .findAll({ raw: true, order: [["id", "desc"]] })
-    .then((perguntas) => {
-      // console.log(perguntas);
-      res.render("index", {
-        perguntas,
-      });
-    });
-});
-
-app.get("/salvarpergunta", (req, res) => {
-  const { titulo, descricao } = req.body;
-  modelPergunta
-    .create({
-      titulo,
-      descricao,
-    })
-    .then(() => {
-      res.redirect("/");
-    });
-});
-
-app.get("/pergunta/:id", (req, res) => {
-  const id = req.params.id;
-  modelPergunta
-    .findOne({
-      where: { id: id },
-    })
-    .then((pergunta) => {
-      if (pergunta != undefined) {
-        modelResposta
-          .findAll({
-            where: { perguntaId: pergunta.id }, // Relacionamento
-            order: [["id", "DESC"]],
-          })
-          .then((respostas) => {
-            res.render("pergunta", {
-              pergunta,
-              respostas,
-            });
-          });
-      } else {
-        res.redirect("/");
-      }
-    });
-});
-
-app.post("/responder", (req, res) => {
-  const { corpo, perguntaId } = req.body;
-  modelResposta
-    .create({
-      corpo,
-      perguntaId,
-    })
-    .then(() => {
-      res.redirect(`/pergunta/${perguntaId}`);
-    });
-});
+app.use("/", rotaPerguntas);
+app.use("/", rotaPerguntar);
+app.use("/", rotaPerguntaID);
+app.use("/", rotaResponder);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server connected at http://localhost");
