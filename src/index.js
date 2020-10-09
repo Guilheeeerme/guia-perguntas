@@ -24,10 +24,10 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use("/", rotaPerguntas);
-app.use("/", rotaPerguntar);
-app.use("/", rotaPerguntaID);
-app.use("/", rotaResponder);
+app.use(rotaPerguntas);
+app.use(rotaPerguntar);
+app.use(rotaPerguntaID);
+app.use(rotaResponder);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server connected at http://localhost");
